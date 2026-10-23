@@ -12,4 +12,5 @@ public class SchemaTable
     public ICollection<SchemaColumn> Columns { get; set; } = new List<SchemaColumn>();
     public ICollection<SchemaRelationship> SourceRelationships { get; set; } = new List<SchemaRelationship>();
     public ICollection<SchemaRelationship> TargetRelationships { get; set; } = new List<SchemaRelationship>();
+    public ICollection<GenerationJobTable> GenerationJobTables { get; set; } = new List<GenerationJobTable>();
 }

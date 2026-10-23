@@ -10,4 +10,5 @@ public class Project
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     public ICollection<SchemaTable> Tables { get; set; } = new List<SchemaTable>();
     public ICollection<SchemaRelationship> Relationships { get; set; } = new List<SchemaRelationship>();
+    public ICollection<GenerationJob> GenerationJobs { get; set; } = new List<GenerationJob>();
 }
