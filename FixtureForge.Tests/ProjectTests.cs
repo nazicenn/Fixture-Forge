@@ -25,4 +25,19 @@ public class ProjectTests
         Assert.Equal(id, project.Id);
         Assert.Equal("Test", project.Name);
     }
+
+    [Fact]
+    public void Project_SchemaVersion_DefaultsToOne()
+    {
+        var project = new Project();
+        Assert.Equal(1, project.SchemaVersion);
+    }
+
+    [Fact]
+    public void Project_SchemaVersion_CanBeIncremented()
+    {
+        var project = new Project();
+        project.SchemaVersion++;
+        Assert.Equal(2, project.SchemaVersion);
+    }
 }
