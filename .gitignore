@@ -1,0 +1,43 @@
+# ===== .NET =====
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+*.dbmdl
+publish/
+TestResults/
+*.trx
+
+# ===== Node / Vite =====
+node_modules/
+dist/
+dist-ssr/
+*.local
+.vite/
+
+# ===== Env / Secrets =====
+.env
+.env.local
+.env.*.local
+appsettings.*.local.json
+*.pfx
+
+# ===== Logs =====
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== IDE =====
+.idea/
+.vscode/*
+!.vscode/extensions.json

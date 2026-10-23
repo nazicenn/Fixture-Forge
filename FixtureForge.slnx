@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="FixtureForge.Api/FixtureForge.Api.csproj" />
+  <Project Path="FixtureForge.Application/FixtureForge.Application.csproj" />
+  <Project Path="FixtureForge.Contracts/FixtureForge.Contracts.csproj" />
+  <Project Path="FixtureForge.Domain/FixtureForge.Domain.csproj" />
+  <Project Path="FixtureForge.Infrastructure/FixtureForge.Infrastructure.csproj" />
+  <Project Path="FixtureForge.Persistence/FixtureForge.Persistence.csproj" />
+  <Project Path="FixtureForge.Tests/FixtureForge.Tests.csproj" />
+</Solution>
