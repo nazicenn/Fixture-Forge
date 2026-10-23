@@ -14,7 +14,7 @@ export function GenerationJobsPage() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const [randomSeed, setRandomSeed] = useState<number>(Math.floor(Math.random() * 100000));
+  const [randomSeed, setRandomSeed] = useState<number>(() => Math.floor(Math.random() * 100000));
   const [targets, setTargets] = useState<Record<string, number>>({});
 
   const load = useCallback(async () => {
