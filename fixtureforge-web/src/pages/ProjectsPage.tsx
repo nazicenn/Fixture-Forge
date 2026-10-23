@@ -10,18 +10,22 @@ export function ProjectsPage() {
   const [form, setForm] = useState<CreateProjectRequest>({ name: '', description: '' });
   const [submitting, setSubmitting] = useState(false);
 
-  const loadProjects = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await projectsApi.getAll();
-      setProjects(data);
-    } catch {
-      setError('Projeler yüklenemedi.');
-    } finally {
-      setLoading(false);
-    }
-  };
+const loadProjects = async () => {
+  setError(null);
+  try {
+    const data = await projectsApi.getAll();
+    setProjects(data);
+  } catch {
+    setError('Projeler yüklenemedi.');
+  } finally {
+    setLoading(false);
+  }
+};
+
+useEffect(() => {
+  loadProjects();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
 
   useEffect(() => {
     loadProjects();
