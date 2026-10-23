@@ -11,6 +11,8 @@ public class AppDbContext : DbContext
     public DbSet<SchemaTable> SchemaTables => Set<SchemaTable>();
     public DbSet<SchemaColumn> SchemaColumns => Set<SchemaColumn>();
     public DbSet<SchemaRelationship> SchemaRelationships => Set<SchemaRelationship>();
+    public DbSet<GenerationJob> GenerationJobs => Set<GenerationJob>();
+    public DbSet<GenerationJobTable> GenerationJobTables => Set<GenerationJobTable>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

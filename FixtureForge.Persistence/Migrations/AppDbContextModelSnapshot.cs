@@ -22,6 +22,101 @@ namespace FixtureForge.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("FixtureForge.Domain.Entities.GenerationJob", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ErrorSummary")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<int>("GeneratedRowCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("GeneratorVersionTag")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("RandomSeed")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RuleVersionTag")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("SchemaVersionTag")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("SnapshotJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("StartedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId", "CreatedAt");
+
+                    b.ToTable("GenerationJobs", (string)null);
+                });
+
+            modelBuilder.Entity("FixtureForge.Domain.Entities.GenerationJobTable", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ErrorSummary")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<int>("GeneratedRowCount")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("GenerationJobId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SchemaTableId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("TargetRowCount")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SchemaTableId");
+
+                    b.HasIndex("GenerationJobId", "SchemaTableId")
+                        .IsUnique();
+
+                    b.ToTable("GenerationJobTables", (string)null);
+                });
+
             modelBuilder.Entity("FixtureForge.Domain.Entities.Project", b =>
                 {
                     b.Property<Guid>("Id")
@@ -185,6 +280,36 @@ namespace FixtureForge.Persistence.Migrations
                     b.ToTable("SchemaTables", (string)null);
                 });
 
+            modelBuilder.Entity("FixtureForge.Domain.Entities.GenerationJob", b =>
+                {
+                    b.HasOne("FixtureForge.Domain.Entities.Project", "Project")
+                        .WithMany("GenerationJobs")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("FixtureForge.Domain.Entities.GenerationJobTable", b =>
+                {
+                    b.HasOne("FixtureForge.Domain.Entities.GenerationJob", "GenerationJob")
+                        .WithMany("Tables")
+                        .HasForeignKey("GenerationJobId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FixtureForge.Domain.Entities.SchemaTable", "SchemaTable")
+                        .WithMany("GenerationJobTables")
+                        .HasForeignKey("SchemaTableId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("GenerationJob");
+
+                    b.Navigation("SchemaTable");
+                });
+
             modelBuilder.Entity("FixtureForge.Domain.Entities.SchemaColumn", b =>
                 {
                     b.HasOne("FixtureForge.Domain.Entities.SchemaTable", "SchemaTable")
@@ -250,8 +375,15 @@ namespace FixtureForge.Persistence.Migrations
                     b.Navigation("Project");
                 });
 
+            modelBuilder.Entity("FixtureForge.Domain.Entities.GenerationJob", b =>
+                {
+                    b.Navigation("Tables");
+                });
+
             modelBuilder.Entity("FixtureForge.Domain.Entities.Project", b =>
                 {
+                    b.Navigation("GenerationJobs");
+
                     b.Navigation("Relationships");
 
                     b.Navigation("Tables");
@@ -267,6 +399,8 @@ namespace FixtureForge.Persistence.Migrations
             modelBuilder.Entity("FixtureForge.Domain.Entities.SchemaTable", b =>
                 {
                     b.Navigation("Columns");
+
+                    b.Navigation("GenerationJobTables");
 
                     b.Navigation("SourceRelationships");
 
