@@ -13,7 +13,6 @@ export function ProjectsPage() {
   const [submitting, setSubmitting] = useState(false);
 
   const loadProjects = useCallback(async () => {
-    setError(null);
     try {
       const data = await projectsApi.getAll();
       setProjects(data);
@@ -32,6 +31,7 @@ export function ProjectsPage() {
     e.preventDefault();
     if (!form.name.trim()) return;
 
+    setError(null);
     setSubmitting(true);
     try {
       await projectsApi.create(form);
@@ -46,6 +46,7 @@ export function ProjectsPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Bu projeyi silmek istediğinize emin misiniz?')) return;
+    setError(null);
     try {
       await projectsApi.delete(id);
       await loadProjects();

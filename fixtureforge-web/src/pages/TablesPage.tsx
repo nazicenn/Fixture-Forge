@@ -14,7 +14,6 @@ export function TablesPage() {
 
   const load = useCallback(async () => {
     if (!projectId) return;
-    setError(null);
     try {
       setTables(await tablesApi.getAll(projectId));
     } catch {
@@ -31,6 +30,7 @@ export function TablesPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!projectId || !form.name.trim()) return;
+    setError(null);
     setSubmitting(true);
     try {
       await tablesApi.create(projectId, form);
@@ -45,6 +45,7 @@ export function TablesPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Bu tabloyu silmek istediğinize emin misiniz?')) return;
+    setError(null);
     try {
       await tablesApi.delete(id);
       await load();

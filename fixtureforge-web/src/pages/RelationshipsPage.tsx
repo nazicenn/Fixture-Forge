@@ -96,6 +96,7 @@ export function RelationshipsPage() {
 
   const handleDelete = async (id: string) => {
     if (!projectId || !confirm('Silmek istediğinize emin misiniz?')) return;
+    setError(null);
     try {
       await relationshipsApi.delete(id);
       setRelationships(await relationshipsApi.getAll(projectId));

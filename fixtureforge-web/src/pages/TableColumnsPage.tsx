@@ -26,7 +26,6 @@ export function TableColumnsPage() {
 
   const load = useCallback(async () => {
     if (!tableId) return;
-    setError(null);
     try {
       setColumns(await columnsApi.getAll(tableId));
     } catch {
@@ -43,6 +42,7 @@ export function TableColumnsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!tableId || !form.name.trim()) return;
+    setError(null);
     setSubmitting(true);
     try {
       await columnsApi.create(tableId, { ...form, ordinalPosition: columns.length });
@@ -57,6 +57,7 @@ export function TableColumnsPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Silmek istediğinize emin misiniz?')) return;
+    setError(null);
     try {
       await columnsApi.delete(id);
       await load();
