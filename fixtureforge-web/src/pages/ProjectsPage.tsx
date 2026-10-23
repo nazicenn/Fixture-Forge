@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { projectsApi } from '../api/projects';
 import type { Project, CreateProjectRequest } from '../types/project';
 
 export function ProjectsPage() {
+  const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -10,22 +12,17 @@ export function ProjectsPage() {
   const [form, setForm] = useState<CreateProjectRequest>({ name: '', description: '' });
   const [submitting, setSubmitting] = useState(false);
 
-const loadProjects = async () => {
-  setError(null);
-  try {
-    const data = await projectsApi.getAll();
-    setProjects(data);
-  } catch {
-    setError('Projeler yüklenemedi.');
-  } finally {
-    setLoading(false);
-  }
-};
-
-useEffect(() => {
-  loadProjects();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, []);
+  const loadProjects = async () => {
+    setError(null);
+    try {
+      const data = await projectsApi.getAll();
+      setProjects(data);
+    } catch {
+      setError('Projeler yüklenemedi.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     loadProjects();
@@ -106,7 +103,12 @@ useEffect(() => {
                 <td style={{ padding: 8 }}>{p.description ?? '-'}</td>
                 <td style={{ padding: 8 }}>{new Date(p.createdAt).toLocaleString('tr-TR')}</td>
                 <td style={{ padding: 8 }}>
-                  <button onClick={() => handleDelete(p.id)} style={{ color: 'red' }}>Sil</button>
+                   <button onClick={() => navigate(`/projects/${p.id}`)} style={{ marginRight: 8 }}>
+                      Detay
+                        </button>
+                    <button onClick={() => handleDelete(p.id)} style={{ color: 'red' }}>
+                      Sil
+                      </button>
                 </td>
               </tr>
             ))}
