@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { relationshipsApi, tablesApi, columnsApi } from '../api/schema';
 import type { Relationship, SchemaTable, SchemaColumn } from '../types/schema';
@@ -17,59 +17,82 @@ export function RelationshipsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const loadInitial = useCallback(async () => {
     if (!projectId) return;
-    (async () => {
-      try {
-        const [rels, tbls] = await Promise.all([
-          relationshipsApi.getAll(projectId),
-          tablesApi.getAll(projectId),
-        ]);
-        setRelationships(rels);
-        setTables(tbls);
-      } catch {
-        setError('Veriler yüklenemedi.');
-      } finally {
-        setLoading(false);
-      }
-    })();
+    try {
+      const [rels, tbls] = await Promise.all([
+        relationshipsApi.getAll(projectId),
+        tablesApi.getAll(projectId),
+      ]);
+      setRelationships(rels);
+      setTables(tbls);
+    } catch {
+      setError('Veriler yüklenemedi.');
+    } finally {
+      setLoading(false);
+    }
   }, [projectId]);
 
   useEffect(() => {
-    if (!sourceTableId) { setSourceColumns([]); setSourceColumnId(''); return; }
-    columnsApi.getAll(sourceTableId).then(setSourceColumns).catch(() => setSourceColumns([]));
+    loadInitial();
+  }, [loadInitial]);
+
+  const loadSourceColumns = useCallback(async () => {
+    if (!sourceTableId) {
+      setSourceColumns([]);
+      setSourceColumnId('');
+      return;
+    }
+    try {
+      setSourceColumns(await columnsApi.getAll(sourceTableId));
+    } catch {
+      setSourceColumns([]);
+    }
   }, [sourceTableId]);
 
   useEffect(() => {
-    if (!targetTableId) { setTargetColumns([]); setTargetColumnId(''); return; }
-    columnsApi.getAll(targetTableId).then(setTargetColumns).catch(() => setTargetColumns([]));
+    loadSourceColumns();
+  }, [loadSourceColumns]);
+
+  const loadTargetColumns = useCallback(async () => {
+    if (!targetTableId) {
+      setTargetColumns([]);
+      setTargetColumnId('');
+      return;
+    }
+    try {
+      setTargetColumns(await columnsApi.getAll(targetTableId));
+    } catch {
+      setTargetColumns([]);
+    }
   }, [targetTableId]);
 
- const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!projectId || !sourceTableId || !sourceColumnId || !targetTableId || !targetColumnId) {
-    setError('Lütfen tüm alanları doldurun.');
-    return;
-  }
-  setError(null);
-  try {
-    const created = await relationshipsApi.create(projectId, {
-      sourceTableId, sourceColumnId, targetTableId, targetColumnId, relationshipType: 'FK',
-    });
-    console.log('İlişki oluşturuldu:', created);
-    setSourceTableId(''); setSourceColumnId(''); setTargetTableId(''); setTargetColumnId('');
-    const rels = await relationshipsApi.getAll(projectId);
-    setRelationships(rels);
-  } catch (err: any) {
-    console.error('İlişki hatası:', err?.response?.status, err?.response?.data);
-    const data = err?.response?.data;
-    const msg = data?.error
-      ?? (Array.isArray(data) ? data.map((e: any) => e.errorMessage).join('; ') : null)
-      ?? (data?.errors ? Object.values(data.errors).flat().join('; ') : null)
-      ?? `İlişki oluşturulamadı (${err?.response?.status ?? '?'})`;
-    setError(msg);
-  }
-};
+  useEffect(() => {
+    loadTargetColumns();
+  }, [loadTargetColumns]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!projectId || !sourceTableId || !sourceColumnId || !targetTableId || !targetColumnId) {
+      setError('Lütfen tüm alanları doldurun.');
+      return;
+    }
+    setError(null);
+    try {
+      await relationshipsApi.create(projectId, {
+        sourceTableId, sourceColumnId, targetTableId, targetColumnId, relationshipType: 'FK',
+      });
+      setSourceTableId(''); setSourceColumnId(''); setTargetTableId(''); setTargetColumnId('');
+      setRelationships(await relationshipsApi.getAll(projectId));
+    } catch (err: any) {
+      const data = err?.response?.data;
+      const msg = data?.error
+        ?? (Array.isArray(data) ? data.map((e: any) => e.errorMessage).join('; ') : null)
+        ?? (data?.errors ? Object.values(data.errors).flat().join('; ') : null)
+        ?? `İlişki oluşturulamadı (${err?.response?.status ?? '?'})`;
+      setError(msg);
+    }
+  };
 
   const handleDelete = async (id: string) => {
     if (!projectId || !confirm('Silmek istediğinize emin misiniz?')) return;

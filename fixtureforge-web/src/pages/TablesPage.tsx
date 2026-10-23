@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { tablesApi } from '../api/schema';
 import type { SchemaTable, CreateTableRequest } from '../types/schema';
@@ -12,7 +12,7 @@ export function TablesPage() {
   const [form, setForm] = useState<CreateTableRequest>({ name: '', description: '' });
   const [submitting, setSubmitting] = useState(false);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     if (!projectId) return;
     setError(null);
     try {
@@ -22,9 +22,11 @@ export function TablesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [projectId]);
 
-  useEffect(() => { load(); }, [projectId]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,7 +55,7 @@ export function TablesPage() {
 
   return (
     <div style={{ maxWidth: 900, margin: '0 auto', padding: 24, fontFamily: 'system-ui, sans-serif' }}>
-      <button onClick={() => navigate('/')}>← Projelere dön</button>
+      <button onClick={() => navigate(`/projects/${projectId}`)}>← Projeye dön</button>
       <h1>Tablolar</h1>
 
       <form onSubmit={handleSubmit} style={{ marginBottom: 24, padding: 16, border: '1px solid #ddd', borderRadius: 8 }}>

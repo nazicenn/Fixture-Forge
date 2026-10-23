@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { projectsApi } from '../api/projects';
 import type { Project, CreateProjectRequest } from '../types/project';
@@ -12,7 +12,7 @@ export function ProjectsPage() {
   const [form, setForm] = useState<CreateProjectRequest>({ name: '', description: '' });
   const [submitting, setSubmitting] = useState(false);
 
-  const loadProjects = async () => {
+  const loadProjects = useCallback(async () => {
     setError(null);
     try {
       const data = await projectsApi.getAll();
@@ -22,11 +22,11 @@ export function ProjectsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadProjects();
-  }, []);
+  }, [loadProjects]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,12 +103,15 @@ export function ProjectsPage() {
                 <td style={{ padding: 8 }}>{p.description ?? '-'}</td>
                 <td style={{ padding: 8 }}>{new Date(p.createdAt).toLocaleString('tr-TR')}</td>
                 <td style={{ padding: 8 }}>
-                   <button onClick={() => navigate(`/projects/${p.id}`)} style={{ marginRight: 8 }}>
-                      Detay
-                        </button>
-                    <button onClick={() => handleDelete(p.id)} style={{ color: 'red' }}>
-                      Sil
-                      </button>
+                  <button
+                    onClick={() => navigate(`/projects/${p.id}`)}
+                    style={{ marginRight: 8 }}
+                  >
+                    Detay
+                  </button>
+                  <button onClick={() => handleDelete(p.id)} style={{ color: 'red' }}>
+                    Sil
+                  </button>
                 </td>
               </tr>
             ))}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { columnsApi } from '../api/schema';
 import type { SchemaColumn, CreateColumnRequest } from '../types/schema';
@@ -24,7 +24,7 @@ export function TableColumnsPage() {
     defaultValue: null, maxLength: null, precision: null, scale: null, ordinalPosition: 0,
   });
 
-  const load = async () => {
+  const load = useCallback(async () => {
     if (!tableId) return;
     setError(null);
     try {
@@ -34,9 +34,11 @@ export function TableColumnsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [tableId]);
 
-  useEffect(() => { load(); }, [tableId]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
