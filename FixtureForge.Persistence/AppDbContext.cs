@@ -8,6 +8,9 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     public DbSet<Project> Projects => Set<Project>();
+    public DbSet<SchemaTable> SchemaTables => Set<SchemaTable>();
+    public DbSet<SchemaColumn> SchemaColumns => Set<SchemaColumn>();
+    public DbSet<SchemaRelationship> SchemaRelationships => Set<SchemaRelationship>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
