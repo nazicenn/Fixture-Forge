@@ -52,10 +52,10 @@ export function ProjectDetailPage() {
           <span style={{ color: '#666' }}>Tablo ilişkileri (FK)</span>
         </Link>
 
-        <div style={{ ...cardStyle, opacity: 0.5, cursor: 'not-allowed' }}>
+        <Link to={`/projects/${project.id}/generation-jobs`} style={cardStyle}>
           <strong>Veri Üretimi</strong>
-          <span style={{ color: '#666' }}>Yakında (3. Hafta)</span>
-        </div>
+          <span style={{ color: '#666' }}>Test verisi oluştur</span>
+        </Link>
 
         <div style={{ ...cardStyle, opacity: 0.5, cursor: 'not-allowed' }}>
           <strong>Performans</strong>
