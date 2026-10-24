@@ -22,6 +22,58 @@ namespace FixtureForge.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("FixtureForge.Domain.Entities.DatabaseConnection", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AuthenticationType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DatabaseName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("EncryptedConnectionString")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("ServerReference")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("DatabaseConnections", (string)null);
+                });
+
             modelBuilder.Entity("FixtureForge.Domain.Entities.GenerationJob", b =>
                 {
                     b.Property<Guid>("Id")
@@ -146,6 +198,82 @@ namespace FixtureForge.Persistence.Migrations
                     b.HasIndex("Name");
 
                     b.ToTable("Projects", (string)null);
+                });
+
+            modelBuilder.Entity("FixtureForge.Domain.Entities.QueryExecution", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ConnectionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DurationMs")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ErrorCode")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FingerprintPolicyVersion")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("ParameterSummary")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("QueryFingerprint")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("QueryText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("QueryType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("RowCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RowsAffected")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("ScenarioRunId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long?>("ServerDurationMs")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("StartedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QueryFingerprint");
+
+                    b.HasIndex("ConnectionId", "CreatedAt");
+
+                    b.ToTable("QueryExecutions", (string)null);
                 });
 
             modelBuilder.Entity("FixtureForge.Domain.Entities.SchemaColumn", b =>
@@ -280,6 +408,17 @@ namespace FixtureForge.Persistence.Migrations
                     b.ToTable("SchemaTables", (string)null);
                 });
 
+            modelBuilder.Entity("FixtureForge.Domain.Entities.DatabaseConnection", b =>
+                {
+                    b.HasOne("FixtureForge.Domain.Entities.Project", "Project")
+                        .WithMany("Connections")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
             modelBuilder.Entity("FixtureForge.Domain.Entities.GenerationJob", b =>
                 {
                     b.HasOne("FixtureForge.Domain.Entities.Project", "Project")
@@ -308,6 +447,17 @@ namespace FixtureForge.Persistence.Migrations
                     b.Navigation("GenerationJob");
 
                     b.Navigation("SchemaTable");
+                });
+
+            modelBuilder.Entity("FixtureForge.Domain.Entities.QueryExecution", b =>
+                {
+                    b.HasOne("FixtureForge.Domain.Entities.DatabaseConnection", "Connection")
+                        .WithMany("Queries")
+                        .HasForeignKey("ConnectionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Connection");
                 });
 
             modelBuilder.Entity("FixtureForge.Domain.Entities.SchemaColumn", b =>
@@ -375,6 +525,11 @@ namespace FixtureForge.Persistence.Migrations
                     b.Navigation("Project");
                 });
 
+            modelBuilder.Entity("FixtureForge.Domain.Entities.DatabaseConnection", b =>
+                {
+                    b.Navigation("Queries");
+                });
+
             modelBuilder.Entity("FixtureForge.Domain.Entities.GenerationJob", b =>
                 {
                     b.Navigation("Tables");
@@ -382,6 +537,8 @@ namespace FixtureForge.Persistence.Migrations
 
             modelBuilder.Entity("FixtureForge.Domain.Entities.Project", b =>
                 {
+                    b.Navigation("Connections");
+
                     b.Navigation("GenerationJobs");
 
                     b.Navigation("Relationships");

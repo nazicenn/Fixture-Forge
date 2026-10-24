@@ -11,4 +11,5 @@ public class Project
     public ICollection<SchemaTable> Tables { get; set; } = new List<SchemaTable>();
     public ICollection<SchemaRelationship> Relationships { get; set; } = new List<SchemaRelationship>();
     public ICollection<GenerationJob> GenerationJobs { get; set; } = new List<GenerationJob>();
+    public ICollection<DatabaseConnection> Connections { get; set; } = new List<DatabaseConnection>();
 }

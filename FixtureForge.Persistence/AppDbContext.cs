@@ -13,6 +13,8 @@ public class AppDbContext : DbContext
     public DbSet<SchemaRelationship> SchemaRelationships => Set<SchemaRelationship>();
     public DbSet<GenerationJob> GenerationJobs => Set<GenerationJob>();
     public DbSet<GenerationJobTable> GenerationJobTables => Set<GenerationJobTable>();
+    public DbSet<DatabaseConnection> DatabaseConnections => Set<DatabaseConnection>();
+    public DbSet<QueryExecution> QueryExecutions => Set<QueryExecution>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
