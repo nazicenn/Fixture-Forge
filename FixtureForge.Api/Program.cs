@@ -1,5 +1,6 @@
-using FixtureForge.Infrastructure;   
+using FixtureForge.Infrastructure;
 using FixtureForge.Persistence;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,15 @@ builder.Services.AddApplication();
 
 builder.Services.AddCors(o => o.AddDefaultPolicy(p =>
     p.WithOrigins("http://localhost:5173").AllowAnyHeader().AllowAnyMethod()));
+
+var dataProtection = builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(builder.Environment.ContentRootPath, ".dpkeys")))
+    .SetApplicationName("FixtureForge");
+
+if (OperatingSystem.IsWindows())
+{
+    dataProtection.ProtectKeysWithDpapi();
+}
 
 var app = builder.Build();
 
