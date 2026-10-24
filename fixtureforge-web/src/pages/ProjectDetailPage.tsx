@@ -28,7 +28,7 @@ export function ProjectDetailPage() {
   if (!project) return <p style={{ padding: 24 }}>Proje bulunamadı.</p>;
 
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', padding: 24, fontFamily: 'system-ui, sans-serif' }}>
+    <div style={{ maxWidth: 1000, margin: '0 auto', padding: 24, fontFamily: 'system-ui, sans-serif' }}>
       <button onClick={() => navigate('/')}>← Projelere dön</button>
 
       <h1>{project.name}</h1>
@@ -41,7 +41,7 @@ export function ProjectDetailPage() {
       </div>
 
       <h2>Modüller</h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
         <Link to={`/projects/${project.id}/tables`} style={cardStyle}>
           <strong>Tablolar</strong>
           <span style={{ color: '#666' }}>Tablo ve sütun tanımları</span>
@@ -55,6 +55,16 @@ export function ProjectDetailPage() {
         <Link to={`/projects/${project.id}/generation-jobs`} style={cardStyle}>
           <strong>Veri Üretimi</strong>
           <span style={{ color: '#666' }}>Test verisi oluştur</span>
+        </Link>
+
+        <Link to={`/projects/${project.id}/connections`} style={cardStyle}>
+          <strong>Bağlantılar</strong>
+          <span style={{ color: '#666' }}>SQL Server profilleri</span>
+        </Link>
+
+        <Link to={`/projects/${project.id}/query`} style={cardStyle}>
+          <strong>SQL Workspace</strong>
+          <span style={{ color: '#666' }}>Sorgu çalıştır</span>
         </Link>
 
         <div style={{ ...cardStyle, opacity: 0.5, cursor: 'not-allowed' }}>
