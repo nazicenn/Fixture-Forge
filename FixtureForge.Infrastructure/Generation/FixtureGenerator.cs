@@ -57,10 +57,28 @@ public class FixtureGenerator : IFixtureGenerator
             foreach (var table in orderedTables)
             {
                 var target = targets[table.Id];
-                if (target <= 0) { MarkTable(job, table.Id, "Skipped", 0, null); continue; }
+                if (target <= 0)
+                {
+                    MarkTable(job, table.Id, "Skipped", 0, "Hedef kayıt sayısı 0.");
+                    continue;
+                }
+
+                // ✅ YENİ: Sütunsuz tablo → atla
+                if (table.Columns.Count == 0)
+                {
+                    MarkTable(job, table.Id, "Skipped", 0, "Tabloda sütun tanımı yok.");
+                    continue;
+                }
 
                 var pkColumn = table.Columns.FirstOrDefault(c => c.IsPrimaryKey);
                 var fkColumns = relationships.Where(r => r.SourceTableId == table.Id).ToList();
+
+                // ✅ YENİ: PK'sız + FK varsa → hata
+                if (pkColumn is null && fkColumns.Any())
+                {
+                    throw new InvalidOperationException(
+                        $"{table.Name} tablosunda birincil anahtar yok; FK üretimi için PK gerekli.");
+                }
 
                 var keys = new List<object>();
 
@@ -73,8 +91,13 @@ public class FixtureGenerator : IFixtureGenerator
                         var fk = fkColumns.FirstOrDefault(f => f.SourceColumnId == col.Id);
                         if (fk is not null)
                         {
+                            // ✅ YENİ: FK hedefinde PK değeri yoksa → net hata
                             if (!generatedKeys.TryGetValue(fk.TargetTableId, out var targetKeys) || targetKeys.Count == 0)
-                                throw new InvalidOperationException($"{table.Name}.{col.Name} için hedef tablo verisi yok.");
+                            {
+                                throw new InvalidOperationException(
+                                    $"{table.Name}.{col.Name} için hedef tabloda PK değeri bulunamadı. " +
+                                    $"Hedef tabloya PK sütunu ekleyin veya hedef tabloya veri üretin.");
+                            }
                             values[col.Id] = targetKeys[rng.Next(targetKeys.Count)];
                         }
                         else
@@ -146,6 +169,7 @@ public class FixtureGenerator : IFixtureGenerator
         {
             var target = targets[table.Id];
             if (target <= 0) continue;
+            if (table.Columns.Count == 0) continue;   // ✅ YENİ: sütunsuz tabloyu atla
 
             sb.AppendLine($"-- Table: {table.Name} ({target} rows)");
 
@@ -161,7 +185,11 @@ public class FixtureGenerator : IFixtureGenerator
                     var fk = fkColumns.FirstOrDefault(f => f.SourceColumnId == col.Id);
                     if (fk is not null)
                     {
-                        var tk = generatedKeys[fk.TargetTableId];
+                        if (!generatedKeys.TryGetValue(fk.TargetTableId, out var tk) || tk.Count == 0)
+                        {
+                            throw new InvalidOperationException(
+                                $"{table.Name}.{col.Name} için hedef tabloda PK değeri bulunamadı.");
+                        }
                         values[col.Id] = tk[rng.Next(tk.Count)];
                     }
                     else
